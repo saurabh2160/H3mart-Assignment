@@ -6,7 +6,9 @@ const { productList, index } = require('../controller/productlist')
 
 
 router.post('/uploadexcelFile', productList)
-router.get('/', index)
+
+//to make call from browser
+router.get('/excelFile', index)
 
 
 
