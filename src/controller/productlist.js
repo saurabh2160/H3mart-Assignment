@@ -12,23 +12,14 @@ const productList = async (req, res) => {
         const data = req.files
         const json_excel_sheet = excelToJson(data[0]) //returns array of objects with object containing product_code 
 
-        //for looping the array of objects to send the product_code in axios call
-        for (let i of json_excel_sheet) {
 
-            //make api call to get product price
-            const axiosres = await apiCalls(i.product_code)
-
-            //if error is encountred in axios call
-            if (axiosres.status == false) {
-                return res.status(400).send({
-                    status: false, msg: `enable to fetch product data${i.product_code}`
-                })
-            }
-            //new key name price getting created and value also assigned in the object that we are currently inside
-            i["price"] = axiosres.data.price
+        //make api call to get product price
+        let arr_prices = await apiCalls(json_excel_sheet)
+        if (arr_prices.status === false) {
+            return res.status(400).send({ status: false, data: "error in fetch data from api" })
         }
         //this is fucntion that will convert json to excel
-        await json_to_excel(json_excel_sheet)
+        await json_to_excel(arr_prices.data)
 
         //sending response to download updated file
         return res.download("product_list.xlsx");

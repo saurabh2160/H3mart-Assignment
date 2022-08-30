@@ -3,18 +3,28 @@ const axios = require('axios')
 
 
 //axios call to the product api
-const apiCalls = async (productId) => {
+const apiCalls = async (productarr) => {
     try {
-        const url = ` https://api.storerestapi.com/products/${productId}`
-        const headers = {
-            "Accept": "application/json",
+        let arr = []
+        for (let i of productarr) {
+            //console.log(i);
+            const url = `https://api.storerestapi.com/products/${i.product_code}`
+            const headers = {
+                "Accept": "application/json",
+            }
+            const apidata = axios.get(url, { headers })
+            arr.push(apidata)
         }
-        const apidata = await axios.get(url, { headers })
 
-        //succesful response
-        return {
-            status: true, data: apidata.data.data
+        //for looping to make a new key inside original object
+        for (let i = 0; i < arr.length; i++) {
+            let result = await arr[i]
+            productarr[i]['product_price'] = result.data.data.price;
         }
+        return {
+            status: true, data: productarr
+        }
+
     }
     catch (e) {
         console.log(e.message)
